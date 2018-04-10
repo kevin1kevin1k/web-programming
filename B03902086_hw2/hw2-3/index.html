@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>
+      To-Do List
+    </title>
+  </head>
+
+  <body>
+    <h1>
+      To-Do List |
+      <span id="unfinished">
+        0
+      </span>
+      unfinished |
+      <span id="finished">
+        0
+      </span>
+      finished
+    </h1>
+    
+    <ul>
+      <li>
+        <form>
+          <input type="text" autofocus>
+          <input type="submit" value="Add TodoList" onclick="add_todolist(this); return false;">
+        </form>
+      </li>
+    </ul>
+  </body>
+</html>
+
+<style>
+  span {
+    margin: 0 3px 0 0;
+  }
+
+  li {
+    margin: 10px 10px 10px 10px; 
+  }
+</style>
+
+<script>
+  // prevent line break while editing
+  function prevent_br(event) {
+    if (event.which == 13) {
+      this.blur();
+    }
+  }
+
+  function change_value(element, num) {
+    element.innerHTML = parseInt(element.innerHTML) + num;
+  }
+
+  function add_todolist(element) {
+    var form = element.previousElementSibling;
+    var text_node = document.createTextNode(form.value);
+    form.value = "";
+
+    var span = document.createElement("SPAN");
+    span.appendChild(text_node);
+    span.contentEditable = "true";
+    span.addEventListener("keypress", prevent_br);
+    
+    var counter = document.createElement("SPAN");
+    counter.innerHTML = " [<span>0</span> unfinished]";
+    
+    var button_delete = document.createElement("BUTTON");
+    button_delete.textContent = "Delete";
+    button_delete.addEventListener("click", delete_todolist);
+    
+    var button_sub = document.createElement("BUTTON");
+    button_sub.textContent = "Add TodoItem";
+    button_sub.addEventListener("click", new_todoitem);
+    
+    var new_li = document.createElement("LI");
+    new_li.appendChild(span);
+    new_li.appendChild(counter);
+    new_li.appendChild(button_delete);
+    new_li.appendChild(button_sub);
+    
+    var li = element.parentElement.parentElement;
+    var ul = li.parentElement;
+    ul.insertBefore(new_li, li);
+  }
+
+  function add_todoitem(element) {
+    var form = element.previousElementSibling;
+    var text_node = document.createTextNode(form.value);
+    form.value = "";
+
+    var span = document.createElement("SPAN");
+    span.appendChild(text_node);
+    span.contentEditable = "true";
+    span.addEventListener("keypress", prevent_br);
+    
+    var checkbox = document.createElement("INPUT");
+    checkbox.setAttribute("type", "checkbox");
+    checkbox.addEventListener("click", check);
+    
+    var button_delete = document.createElement("BUTTON");
+    button_delete.textContent = "Delete";
+    button_delete.addEventListener("click", delete_todoitem);
+    
+    var new_li = document.createElement("LI");
+    new_li.appendChild(span);
+    new_li.appendChild(checkbox);
+    new_li.appendChild(button_delete);
+    
+    var li = element.parentElement.parentElement;
+    var ul = li.parentElement;
+    ul.replaceChild(new_li, li);
+    
+    change_value(document.getElementById("unfinished"), +1);
+    change_value(ul.parentElement.children[1].firstElementChild, +1);
+  }
+  
+  function delete_todolist() {
+    var li = this.parentElement;
+    var ul = li.parentElement;
+    for (let i = li.children.length - 1; i >= 3; i--) {
+      li.children[i].lastElementChild.lastElementChild.click();
+    }
+
+    ul.removeChild(li);
+  }
+
+  function delete_todoitem() {
+    var li = this.parentElement;
+    var ul = li.parentElement;
+    var checkbox = li.children[1];
+    if (checkbox.checked) {
+      change_value(document.getElementById("finished"), -1);
+    }
+    else {
+      change_value(document.getElementById("unfinished"), -1);
+      change_value(ul.parentElement.children[1].firstElementChild, -1);
+    }
+
+    ul.removeChild(li);
+  }
+
+  function check() {
+    var txt = this.parentElement.children[0].innerHTML;
+    var new_txt;
+    var prefix = "<del>", postfix = "</del>";
+    var ul = this.parentElement.parentElement;
+    if (this.checked) {
+      new_txt = prefix + txt + postfix;
+      change_value(document.getElementById("finished"), +1);
+      change_value(document.getElementById("unfinished"), -1);
+      change_value(ul.parentElement.children[1].firstElementChild, -1);
+    }
+    else {
+      new_txt = txt.substring(prefix.length, txt.length - postfix.length);
+      change_value(document.getElementById("finished"), -1);
+      change_value(document.getElementById("unfinished"), +1);
+      change_value(ul.parentElement.children[1].firstElementChild, +1);
+    }
+    this.parentElement.children[0].innerHTML = new_txt;
+  }
+  
+  var ul_str = `
+  <li>
+    <form>
+      <input type="text" autofocus>
+      <input type="submit" value="Add" onclick="add_todoitem(this); return false;">
+    </form>
+  </li>
+  `
+
+  function new_todoitem() {
+    var ul = document.createElement("UL");
+    ul.innerHTML = ul_str;
+    var li = this.parentElement;
+    li.appendChild(ul);
+    ul.children[0].children[0].children[0].focus();
+  }
+</script>

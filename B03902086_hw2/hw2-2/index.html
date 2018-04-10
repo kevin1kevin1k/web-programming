@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div>
+    <button id="btn_left" class="triangle-left" style="float: left;" onclick="btn_left();">
+      
+    </button>
+    <div id="div" style="background-color: gray; display: inline-block;">
+      <video width="320" height="240"  src="https://www.videvo.net/videvo_files/converted/2012_08/preview/Water%20Drop-H264%2075.mov99871.webm"></video>
+      <video width="320" height="240"  src="https://www.videvo.net/videvo_files/converted/2015_08/preview/DewdropRodeo_1.mp414807.webm"></video>
+      <video width="320" height="240"  src="https://www.videvo.net/videvo_files/converted/2013_11/preview/ExplosionandSmoke3Videvo.mov38707.webm"></video>
+      <video width="320" height="240"  src="https://www.videvo.net/videvo_files/converted/2018_02/preview/180224_A_01.mp489612.webm"></video>
+      <video width="320" height="240" src="https://www.videvo.net/videvo_files/converted/2018_01/preview/171124_E1_HD_012.mp476445.webm"></video>
+    </div>
+    <button id="btn_right" class="triangle-right" style="float: right;" onclick="btn_right();">
+      
+    </button>
+  </div>
+
+  <video width="608" height="416" controls id="player" class="center"></video>
+  <br>
+  <input type="file" accept="video/*" onchange="add_video(this.files);" onclick="this.value = null;"/>
+</body>
+
+<script>
+var start = 0;
+var div = document.getElementById("div");
+var player = document.getElementById("player");
+for (let i = 0; i < div.children.length; i++) {
+  if (start <= i && i < start + 3) {
+    div.children[i].style.display = "initial";
+  }
+  else {
+    div.children[i].style.display = "none";
+  }
+  div.children[i].addEventListener("click", change_player);
+}
+document.getElementById("btn_left").disabled = true;
+player.src = div.children[0].src;
+
+function change_player() {
+  document.getElementById("player").src = this.src;
+}
+
+function add_video(files) {
+  var video = document.createElement("VIDEO");
+  video.src = window.URL.createObjectURL(files[0]);
+  video.width = 320;
+  video.height = 240;
+  video.style.display = "none";
+  video.addEventListener("click", change_player);
+  document.getElementById("div").appendChild(video);
+  
+  var btn_right = document.getElementById("btn_right");
+  btn_right.disabled = false;
+  while (btn_right.disabled == false) {
+    btn_right.click();
+  }
+  
+  video.click();
+}
+
+function btn_left() {
+  var div = document.getElementById("div");
+  start--;
+  div.children[start].style.display = "initial";
+  div.children[start + 3].style.display = "none";
+  if (start == 0) {
+    document.getElementById("btn_left").disabled = true;
+  }
+  document.getElementById("btn_right").disabled = false;
+}
+
+function btn_right() {
+  var div = document.getElementById("div");
+  div.children[start].style.display = "none";
+  div.children[start + 3].style.display = "initial";
+  start++;
+  if (start + 3 == div.children.length) {
+    document.getElementById("btn_right").disabled = true;
+  }
+  document.getElementById("btn_left").disabled = false;
+}
+</script>
+
+<style>
+.triangle-left {
+	width: 0;
+	height: 0;
+	border-top: 60px solid transparent;
+	border-right: 120px solid;
+	border-bottom: 60px solid transparent;
+}
+
+.triangle-right {
+	width: 0;
+	height: 0;
+	border-top: 60px solid transparent;
+	border-left: 120px solid;
+	border-bottom: 60px solid transparent;
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+</html>

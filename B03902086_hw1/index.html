@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>
+      InfiNested To-Do List
+    </title>
+  </head>
+
+  <body>
+    <h1>InfiNested To-Do List</h1>
+    <button onclick="clear_all();" style="width: 50pt; height: 20pt;">
+        Clear!
+    </button>
+    
+    <ul id="ul">
+      <li>
+        <form>
+          <input type="text" autofocus>
+          <input type="submit" value="Add" onclick="add(this); return false;">
+        </form>
+      </li>
+    </ul>
+  </body>
+</html>
+
+<style>
+  span {
+    margin: 0 10px 0 0;
+  }
+
+  li {
+    margin: 10px 10px 10px 10px; 
+  }
+</style>
+
+<script>
+  // prevent line break while editing
+  function prevent_br(event) {
+    if (event.which == 13) {
+      this.blur();
+    }
+  }
+
+  function add(node) {
+    var form = node.previousElementSibling;
+    var text_node = document.createTextNode(form.value);
+    form.value = "";
+
+    var span = document.createElement("SPAN");
+    span.appendChild(text_node);
+    span.contentEditable = "true";
+    span.addEventListener("keypress", prevent_br);
+    
+    var button_delete = document.createElement("BUTTON");
+    button_delete.textContent = "Delete";
+    button_delete.addEventListener("click", delete_this);
+    
+    var button_sub = document.createElement("BUTTON");
+    button_sub.textContent = "Subitem";
+    button_sub.addEventListener("click", add_sub);
+    
+    var new_li = document.createElement("LI");
+    new_li.appendChild(span);
+    new_li.appendChild(button_delete);
+    new_li.appendChild(button_sub);
+    
+    var li = node.parentElement.parentElement;
+    var ul = li.parentElement;
+    if (ul.id == "ul") {
+      ul.insertBefore(new_li, li);
+      
+    }
+    else {
+      ul.replaceChild(new_li, li);
+    }
+  }
+
+  function delete_this() {
+    var li = this.parentElement;
+    var ul = li.parentElement;
+    ul.removeChild(li);
+  }
+
+  var ul_str = `
+  <li>
+    <form>
+      <input type="text">
+      <input type="submit" value="Add" onclick="add(this); return false;">
+    </form>
+  </li>
+  `
+
+  function add_sub() {
+    var ul = document.createElement("UL");
+    ul.innerHTML = ul_str;
+    var li = this.parentElement;
+    li.appendChild(ul);
+    ul.children[0].children[0].children[0].focus();
+  }
+
+  function clear_all() {
+    var ul = document.getElementById("ul");
+    ul.innerHTML = ul_str;
+    ul.children[0].children[0].children[0].focus();
+  }
+</script>

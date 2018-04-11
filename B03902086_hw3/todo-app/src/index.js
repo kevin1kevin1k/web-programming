@@ -118,13 +118,31 @@ class TodoListCard extends React.Component {
   render() {
     const todoList = this.props.todoList;
     var todoItemCards = todoList.todoItems.map(
-      (todoItem) => <TodoItemCard todoItem={todoItem} handleToggleTodoItem={this.handleToggleTodoItem} handleDeleteTodoItem={this.handleDeleteTodoItem} />
+      (todoItem) => (
+        <TodoItemCard
+          todoItem={todoItem}
+          handleToggleTodoItem={this.handleToggleTodoItem}
+          handleDeleteTodoItem={this.handleDeleteTodoItem}
+        />
+      )
     );
 
+    var done = 0, pending = 0;
+    todoList.todoItems.forEach(
+      (todoItem) => {
+        if (todoItem.done) {
+          done++;
+        }
+        else {
+          pending++;
+        }
+      }
+    );
+    var content = todoList.name + ", " + todoList.index + ", done: " + done + ", pending: " + pending;
     return (
       <div>
         <span contentEditable="true" onKeyPress={this.handleEnter}>
-          {todoList.name + ", " + todoList.index}
+          {content}
         </span>
         <button
           type="button"
@@ -138,7 +156,7 @@ class TodoListCard extends React.Component {
           <input
             type="text"
             class="form-control"
-            value={this.props.todoList.inputText}
+            value={todoList.inputText}
             placeholder="Enter the title of todo item..."
             onChange={this.onChange}
             autoFocus
@@ -279,6 +297,22 @@ class TodoApp extends React.Component {
   }
 
   render() {
+    var done = 0, pending = 0;
+    this.state.todoLists.forEach(
+      (todoList) => {
+        todoList.todoItems.forEach(
+          (todoItem) => {
+            if (todoItem.done) {
+              done++;
+            }
+            else {
+              pending++;
+            }
+          }
+        );
+      }
+    );
+
     var todoListCards = this.state.todoLists.map(
       (todoList) => (
         <TodoListCard
@@ -295,6 +329,9 @@ class TodoApp extends React.Component {
     return (
         <div>
           <h1>Todo List</h1>
+          <span>
+            done: {done}, pending: {pending}
+          </span>
           <InputBox
             text={this.state.inputText}
             handleCreateTodoList={this.handleCreateTodoList}

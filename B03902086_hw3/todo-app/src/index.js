@@ -46,13 +46,12 @@ class TodoItemCard extends React.Component {
 
   render() {
     const todoItem = this.props.todoItem;
-    const done = todoItem.done ? "done" : "pending";
-    var content = todoItem.name + ", " + done + ", " + todoItem.index;
+    var content;
     if (this.state.del) {
-      content = <del>{content}</del>;
+      content = <del>{todoItem.name}</del>;
     }
     else {
-      content = <span>{content}</span>;
+      content = <span>{todoItem.name}</span>;
     }
 
     return (
@@ -66,7 +65,7 @@ class TodoItemCard extends React.Component {
         </span>
         <button
           type="button"
-          class="close"
+          className="close"
           aria-label="Close"
           onClick={this.handleDeleteThis}
         >
@@ -98,7 +97,7 @@ class TodoListCard extends React.Component {
   }
 
   handleEnter(event) {
-    if (event.which == 13) {
+    if (event.which === 13) {
       event.target.blur();
     }
   }
@@ -120,6 +119,7 @@ class TodoListCard extends React.Component {
     var todoItemCards = todoList.todoItems.map(
       (todoItem) => (
         <TodoItemCard
+          key={todoItem.index}
           todoItem={todoItem}
           handleToggleTodoItem={this.handleToggleTodoItem}
           handleDeleteTodoItem={this.handleDeleteTodoItem}
@@ -138,34 +138,48 @@ class TodoListCard extends React.Component {
         }
       }
     );
-    var content = todoList.name + ", " + todoList.index + ", done: " + done + ", pending: " + pending;
+
     return (
-      <div>
-        <span contentEditable="true" onKeyPress={this.handleEnter}>
-          {content}
-        </span>
-        <button
-          type="button"
-          class="close"
-          aria-label="Close"
-          onClick={this.handleDeleteThis}
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <form class="input-group" onSubmit={this.onSubmit}>
+      <div className="card border-secondary text-center" style={{"width": "40vw", "margin-top": "20px"}}>
+        <div className="card-header">
+          <span contentEditable="true" onKeyPress={this.handleEnter}>
+            <strong>{todoList.name}</strong>
+          </span>
+          <button
+            type="button"
+            className="close"
+            aria-label="Close"
+            onClick={this.handleDeleteThis}
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div className="card-body">
+          <button disabled type="button" className="btn btn-success">
+            done
+            <span className="badge badge-light">{done}</span>
+          </button>
+          <button disabled type="button" className="btn btn-secondary">
+            pending
+            <span className="badge badge-light">{pending}</span>
+          </button>
+        </div>
+        <form className="input-group" onSubmit={this.onSubmit} style={{"padding": "10px"}}>
           <input
             type="text"
-            class="form-control"
+            className="form-control"
             value={todoList.inputText}
             placeholder="Enter the title of todo item..."
             onChange={this.onChange}
             autoFocus
           />
-          <span class="input-group-btn">
-            <button type="submit" class="btn btn-success">Create</button>
+          <span className="input-group-btn">
+            <button type="submit" className="btn btn-success">Create</button>
           </span>
         </form>
-        {todoItemCards}
+        <div className="list-group">
+          {todoItemCards}
+        </div>
       </div>
     );
   }
@@ -189,17 +203,17 @@ class InputBox extends React.Component {
 
   render() {
     return (
-      <form class="input-group" onSubmit={this.onSubmit}>
+      <form className="input-group" onSubmit={this.onSubmit}>
         <input
           type="text"
-          class="form-control"
+          className="form-control"
           value={this.props.text}
           placeholder="Enter the title of todo list..."
           onChange={this.onChange}
           autoFocus
         />
-        <span class="input-group-btn">
-          <button type="submit" class="btn btn-success">Create</button>
+        <span className="input-group-btn">
+          <button type="submit" className="btn btn-success">Create</button>
         </span>
       </form>
     );
@@ -316,6 +330,7 @@ class TodoApp extends React.Component {
     var todoListCards = this.state.todoLists.map(
       (todoList) => (
         <TodoListCard
+          key={todoList.index}
           todoList={todoList}
           handleCreateTodoItem={this.handleCreateTodoItem}
           handleCreateTodoItemTextChange={this.handleCreateTodoItemTextChange}
@@ -326,18 +341,45 @@ class TodoApp extends React.Component {
       )
     );
 
+    var cardDecks = [], cardDeck = [];
+    const cardsInOneDeck = 2;
+    for (let i = 0; i < todoListCards.length; i++) {
+      cardDeck.push(todoListCards[i]);
+      if (i % cardsInOneDeck == (cardsInOneDeck - 1)) {
+        cardDecks.push(
+          <div className="card-deck">
+            {cardDeck}
+          </div>
+        );
+        cardDeck = [];
+      }
+    }
+
+    if (todoListCards.length % cardsInOneDeck !== 0) {
+      cardDecks.push(
+        <div className="card-deck">
+          {cardDeck}
+        </div>
+      );
+    }
+
     return (
-        <div>
-          <h1>Todo List</h1>
-          <span>
-            done: {done}, pending: {pending}
-          </span>
+        <div className="container">
+          <h1 style={{"text-align": "center", "margin-top": "20px"}}>Todo List</h1>
+          <button disabled type="button" className="btn btn-success">
+            done
+            <span className="badge badge-light">{done}</span>
+          </button>
+          <button disabled type="button" className="btn btn-secondary">
+            pending
+            <span className="badge badge-light">{pending}</span>
+          </button>
           <InputBox
             text={this.state.inputText}
             handleCreateTodoList={this.handleCreateTodoList}
             handleCreateTodoListTextChange={this.handleCreateTodoListTextChange}
           />
-          {todoListCards}
+          {cardDecks}
         </div>
     );
   }
